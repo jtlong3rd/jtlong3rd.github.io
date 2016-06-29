@@ -1,0 +1,291 @@
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=4a77adcb0d">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic%7COpen+Sans:700,400">
+    <link rel="stylesheet" type="text/css" href="../assets/css/prism.css?v=4a77adcb0d">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>ES6 in Action: Reimplementing 'Bind'</title>
+    <meta name="description" content="">
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=4a77adcb0d">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic%7COpen+Sans:700,400">
+
+    <link rel="canonical" href="http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/">
+    <meta name="referrer" content="origin">
+    
+    <meta property="og:site_name" content="A Mathematician In Not-So-Strange Lands">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="ES6 in Action: Reimplementing 'Bind'">
+    <meta property="og:description" content="In this post, I will illustrate how ES6 can be used to write a surprisingly clean reimplementation of JavaScript's native bind method. In particular, the following ES6 constructs will be employed. It is worth skimming the associated Mozilla developer docs (links below) before reading the rest of the post.      Rest">
+    <meta property="og:url" content="http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/">
+    <meta property="article:published_time" content="2016-06-29T03:43:34.447Z">
+    <meta property="article:modified_time" content="2016-06-29T06:08:52.709Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ES6 in Action: Reimplementing 'Bind'">
+    <meta name="twitter:description" content="In this post, I will illustrate how ES6 can be used to write a surprisingly clean reimplementation of JavaScript's native bind method. In particular, the following ES6 constructs will be employed. It is worth skimming the associated Mozilla developer docs (links below) before reading the rest of the post.      Rest">
+    <meta name="twitter:url" content="http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Jamie Long">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "A Mathematician In Not-So-Strange Lands",
+        "logo": "http://localhost:2368/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Jamie Long",
+        "url": "http://localhost:2368/author/james/",
+        "sameAs": []
+    },
+    "headline": "ES6 in Action: Reimplementing &#x27;Bind&#x27;",
+    "url": "http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/",
+    "datePublished": "2016-06-29T03:43:34.447Z",
+    "dateModified": "2016-06-29T06:08:52.709Z",
+    "description": "In this post, I will illustrate how ES6 can be used to write a surprisingly clean reimplementation of JavaScript&#x27;s native bind method. In particular, the following ES6 constructs will be employed. It is worth skimming the associated Mozilla developer docs (links below) before reading the rest of the post.      Rest"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.8">
+    <link rel="alternate" type="application/rss+xml" title="A Mathematician In Not-So-Strange Lands" href="http://localhost:2368/rss/">
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="index.html#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://jtlong3rd.github.io">Home</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://localhost:2368/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        
+            <a class="menu-button icon-menu" href="index.html#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">ES6 in Action: Reimplementing 'Bind'</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-06-28">28 June 2016</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>In this post, I will illustrate how ES6 can be used to write a surprisingly clean reimplementation of JavaScript's native <code>bind</code> method.</p>
+
+<p>In particular, the following ES6 constructs will be employed. It is worth skimming the associated Mozilla developer docs (links below) before reading the rest of the post.</p>
+
+<ul>  
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters">Rest parameters</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator">The spread operator</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">Arrow functions</a></li>
+</ul>
+
+<h2>Background</h2>
+
+<p>Recall that <code>bind</code> is used to hardcode a function's invocation context (<code>this</code> binding), as well as zero or more of its parameters; the latter are sometimes referred to as <em>bound parameters</em>, and in such circumstances, the remaining parameters are often called <em>free</em>.</p>
+
+<pre><code class="language-javascript">var sum = function(a, b) {  
+  return a+b;
+};
+
+var plusOne = sum.bind(null, 1);
+
+console.log(plusOne(4)); // Logs 5 to the console  
+</code></pre>
+
+<p>Common applications of <code>bind</code> include (1) binding the appropriate context to some sort of event handler which takes callback, as well as (2) simulating the notion of <a href="https://en.wikipedia.org/wiki/Currying">currying</a>, which is of central importance in many functional languages.</p>
+
+<h2>A Detour Through ES5</h2>
+
+<p>If we were to reimplement <code>bind</code> in ES5, we might go about it like this:</p>
+
+<pre><code>1. Store the invoking function in an auxiliary variable  
+2. Store the bound arguments in an array  
+3. Return a function which (1) combines its bound arguments and free arguments into an array, and then (2) invokes the original function with the specified context and combined arguments  
+</code></pre>
+
+<p>Below is a possible transcription of this pseudocode into ES5, warts and all.</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context) {  
+  var self = this;
+  var boundArgs = Array.prototype.slice.call(arguments, 1);
+
+  return function() {
+    var freeArgs = Array.prototype.slice.call(arguments);
+    var combinedArgs = boundArgs.concat(freeArgs);
+
+    return self.apply(context, combinedArgs);
+  };
+};
+</code></pre>
+
+<p>Two aspects of this code leave something to be desired:  </p>
+
+<ul>  
+  <li>The need to store <code>this</code> in a separate variable <code>self</code>, arising from the fact that <code>this</code> will be rebound whenever our "inner function" is invoked</li>
+  <li>The use of the ubiquitous <code>Array.prototype.slice.call</code> "hack" in order to invoke the <code>slice</code> method on the <code>arguments</code> object, which is not an array, but merely "array-like"</li>
+</ul>
+
+<h2>Rest Parameters to the Rescue!</h2>
+
+<p>The <code>Array.prototype.slice.call</code> "hack" is easily rectified by storing <code>boundArgs</code> and <code>freeArgs</code> as rest parameters.</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context, ...boundArgs) {  
+  var self = this;
+
+  return function(...freeArgs) {
+    var combinedArgs = boundArgs.concat(freeArgs);
+    return self.apply(context, combinedArgs);
+  };
+};
+</code></pre>
+
+<p>In particular, we have completely eliminated the need to <code>slice</code> in the first place, let alone employ the <code>Array.prototype.slice.call</code> "hack!" </p>
+
+<p>(Note that we are allowed to invoke <code>concat</code> on <code>boundArgs</code> because in general, rest parameters are not just array-like, but honest-to-goodness arrays.)</p>
+
+<h2>Spread Operator Hijinks</h2>
+
+<p>Before we address the use of <code>self</code>, it's worth noting that we can now eliminate the <code>concat</code>ing of the bound and free arguments into a <code>combinedArgs</code> array by using the spread operator.</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context, ...boundArgs) {  
+  var self = this;
+
+  return function(...freeArgs) {
+    return self.call(context, ...boundArgs, ...freeArgs);
+  };
+};
+</code></pre>
+
+<p>In essence, the above code combines the context, bound arguments, and free arguments into a single comma-separated list by "spreading" <code>boundArgs</code> and <code>freeArgs</code>. Since these items are getting passed as a comma-separated list, we now need to use <code>call</code> instead of <code>apply</code>.</p>
+
+<h2>Arrow Functions Clinch It</h2>
+
+<p>One common misconception of arrow functions is that they are "just" an abbreviated way of defining an anonymous function. Such an attitude would lead us to refactor our code in the following manner.</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context, ...boundArgs) {  
+  var self = this;
+
+  return (...freeArgs) =&gt; self.call(context, ...boundArgs, ...freeArgs);
+};
+</code></pre>
+
+<p>(Note that I have taken advantage of the "concise form" of the arrow function syntax, which says that for single-statement arrow functions, the curly braces, <code>return</code> keyword, and the semicolon after the one statement can all be omitted.)</p>
+
+<p>While this new code works fine, we should recognize that, because arrow function bind <code>this</code> lexically (i.e., based on the surrounding code), we can actually dispense with <code>self</code>, thus making our function body one line long.</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context, ...boundArgs) {  
+  return (...freeArgs) =&gt; this.call(context, ...boundArgs, ...freeArgs);
+};
+</code></pre>
+
+<p>Note that this code is not only more concise, but also arguably more readable, than our original ES5 implementation!</p>
+
+<h2>Here Be Dragons</h2>
+
+<p>In light of our astounding success, it is tempting to convert the outer function expression into an arrow function as well. This, combined with the "concise form" for arrow functions, would give us the following code, which would take up just one line for everything, not just the function body:</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = (context, ...boundArgs) =&gt; (...freeArgs) =&gt; this.call(context, ...boundArgs, ...freeArgs);  
+</code></pre>
+
+<p>Unfortunately, this will <strong>not</strong> work, as although <code>this</code> is still bound lexically, the outer arrow function's position in the code causes <code>this</code> to be bound to the global object (<code>window</code>, <code>process</code>, etc.). This binding is certainly not what we want!</p>
+
+<p>Thus, we'll be content to "settle" for our three lines of code from before:</p>
+
+<pre><code class="language-javascript">Function.prototype.bind = function(context, ...boundArgs) {  
+  return (...freeArgs) =&gt; this.call(context, ...boundArgs, ...freeArgs);
+};
+</code></pre>
+
+<p>Isn't ES6 great?</p>
+        </section>
+
+        <footer class="post-footer">
+
+
+
+            <section class="author">
+                <h4><a href="../author/james/">Jamie Long</a></h4>
+
+                    <p>Read <a href="../author/james/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=ES6%20in%20Action%3A%20Reimplementing%20'Bind'&amp;url=http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://localhost:2368/es6-in-action-reimplementing-javascripts-native-bind-method-2/" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story prev no-cover" href="../tail-recursion-and-es6/">
+        <section class="post">
+            <h2>Tail Recursion and ES6</h2>
+            <p>Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function…</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://localhost:2368">A Mathematician In Not-So-Strange Lands</a> © 2016</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    
+    <script type="text/javascript" src="../assets/js/jquery.fitvids.js?v=4a77adcb0d"></script>
+    <script type="text/javascript" src="../assets/js/index.js?v=4a77adcb0d"></script>
+    <script type="text/javascript" src="../assets/js/prism.js?v=4a77adcb0d"></script>
+
+</body>

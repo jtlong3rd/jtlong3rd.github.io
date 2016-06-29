@@ -1,5 +1,9 @@
 
 <head>
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=4a77adcb0d">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic%7COpen+Sans:700,400">
+    <link rel="stylesheet" type="text/css" href="../assets/css/prism.css?v=4a77adcb0d">
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
@@ -17,16 +21,16 @@
     <link rel="canonical" href="http://localhost:2368/tail-recursion-and-es6/">
     <meta name="referrer" content="origin">
     
-    <meta property="og:site_name" content="A Mathematician in Not-So-Strange Lands">
+    <meta property="og:site_name" content="A Mathematician In Not-So-Strange Lands">
     <meta property="og:type" content="article">
     <meta property="og:title" content="Tail Recursion and ES6">
-    <meta property="og:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What Is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
+    <meta property="og:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
     <meta property="og:url" content="http://localhost:2368/tail-recursion-and-es6/">
     <meta property="article:published_time" content="2016-06-27T15:18:42.861Z">
-    <meta property="article:modified_time" content="2016-06-27T15:45:00.651Z">
+    <meta property="article:modified_time" content="2016-06-29T04:49:20.762Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Tail Recursion and ES6">
-    <meta name="twitter:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What Is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
+    <meta name="twitter:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
     <meta name="twitter:url" content="http://localhost:2368/tail-recursion-and-es6/">
     <meta name="twitter:label1" content="Written by">
     <meta name="twitter:data1" content="Jamie Long">
@@ -37,7 +41,7 @@
     "@type": "Article",
     "publisher": {
         "@type": "Organization",
-        "name": "A Mathematician in Not-So-Strange Lands",
+        "name": "A Mathematician In Not-So-Strange Lands",
         "logo": "http://localhost:2368/ghost/img/ghosticon.jpg"
     },
     "author": {
@@ -49,13 +53,13 @@
     "headline": "Tail Recursion and ES6",
     "url": "http://localhost:2368/tail-recursion-and-es6/",
     "datePublished": "2016-06-27T15:18:42.861Z",
-    "dateModified": "2016-06-27T15:45:00.651Z",
-    "description": "Spoiler alert: As of ES6, JavaScript is a true functional programming language! What Is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to"
+    "dateModified": "2016-06-29T04:49:20.762Z",
+    "description": "Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to"
 }
     </script>
 
     <meta name="generator" content="Ghost 0.8">
-    <link rel="alternate" type="application/rss+xml" title="A Mathematician in Not-So-Strange Lands" href="http://localhost:2368/rss/">
+    <link rel="alternate" type="application/rss+xml" title="A Mathematician In Not-So-Strange Lands" href="http://localhost:2368/rss/">
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 <body class="post-template nav-closed">
@@ -98,7 +102,7 @@
         <section class="post-content">
             <p><strong>Spoiler alert</strong>: As of ES6, JavaScript is a true functional programming language!</p>
 
-<h2>What Is Tail Recursion?</h2>
+<h2>What is Tail Recursion?</h2>
 
 <p>A recursive function is said to be <em>tail-recursive</em> if its only recursive calls are <em>tail calls</em>; that is, subroutine calls whose values are immediately returned.</p>
 
@@ -159,7 +163,7 @@
 
 <p>To make matters even more interesting, if you were to run the natural "ES5-ified" versions of our three solutions, you'd find that, while the iterative solution still returns <code>500000500000</code>, both recursive solutions now yield <code>ReferenceError</code>s.</p>
 
-<h2>What's going on?!</h2>
+<h2>What's Going On?!</h2>
 
 <p>Two questions arise here:  </p>
 
@@ -174,7 +178,7 @@
 
 <p>In a similar vein, both recursive solutions are doomed to fail in ES5, as computing <code>sumUpTo(1000000)</code> would require 1,000,001 stack frames, or about 5-10 times the maximum call stack size for most contemporary browsers!</p>
 
-<p>The reason for the discrepancy between what happens with the tail-recursive solutions in ES5 and ES6 has to with a special "tail call optimization" that was introduced in ES6. Roughly speaking, an ES6 interpreter is able to execute a tail call without "growing the stack" (i.e., creating a new stack frame); instead, it "reuses" stack frames via strategic use of jump (GOTO) operations.</p>
+<p>The reason for the discrepancy between what happens with the tail-recursive solutions in ES5 and ES6 has to do with a special "tail call optimization" that was introduced in ES6. Roughly speaking, an ES6 interpreter is able to execute a tail call without "growing the stack" (i.e., creating a new stack frame); instead, it "reuses" stack frames via strategic use of jump (GOTO) operations.</p>
 
 <p>Consequently, in ES6, the tail-recursive solution consumes only one stack frame, and could thus be used to calculate <code>sumUpTo(n)</code> for arbitrarily large values of \(n\). </p>
 
@@ -184,7 +188,7 @@
 
 <p>Now that JavaScript has proper tail calls "out of the box," it is better-posed to meet the needs of developers who prefer to program in a functional style. Indeed, right before ES6 was released, <a href="http://www.youtube.com/watch?v=PSGEjv3Tqo0&amp;t=11m39s">Douglas Crockford</a> boldly asserted that once tail call optimization became an official part of the language, he would stop using loops altogether.</p>
 
-<p>With that said, the observant reader will have noticed a striking similarity between the iterative and tail-recursive solutions above. This is no accident, and intended to illustrate that, in a sense, a loop is really just an a tail-recursive function in disguise!</p>
+<p>With that said, the observant reader will have noticed a striking similarity between the iterative and tail-recursive solutions above. This was no accident, and was intended to illustrate that, in a sense, a loop is really just a tail-recursive function in disguise!</p>
         </section>
 
         <footer class="post-footer">
@@ -222,6 +226,12 @@
 </main>
 
 <aside class="read-next">
+    <a class="read-next-story no-cover" href="../es6-in-action-reimplementing-javascripts-native-bind-method-2/">
+        <section class="post">
+            <h2>ES6 in Action: Reimplementing 'Bind'</h2>
+            <p>In this post, I will illustrate how ES6 can be used to write a surprisingly clean reimplementation of JavaScript's…</p>
+        </section>
+    </a>
     <a class="read-next-story prev no-cover" href="../hello-world/">
         <section class="post">
             <h2>Hello World</h2>
@@ -233,7 +243,7 @@
 
 
         <footer class="site-footer clearfix">
-            <section class="copyright"><a href="http://localhost:2368">A Mathematician in Not-So-Strange Lands</a> © 2016</section>
+            <section class="copyright"><a href="http://localhost:2368">A Mathematician In Not-So-Strange Lands</a> © 2016</section>
             <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
         </footer>
 
@@ -243,5 +253,6 @@
     
     <script type="text/javascript" src="../assets/js/jquery.fitvids.js?v=4a77adcb0d"></script>
     <script type="text/javascript" src="../assets/js/index.js?v=4a77adcb0d"></script>
+    <script type="text/javascript" src="../assets/js/prism.js?v=4a77adcb0d"></script>
 
 </body>
