@@ -24,7 +24,7 @@
     <meta property="og:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
     <meta property="og:url" content="http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/">
     <meta property="article:published_time" content="2016-07-05T03:18:00.000Z">
-    <meta property="article:modified_time" content="2016-08-08T06:38:03.000Z">
+    <meta property="article:modified_time" content="2016-08-08T06:51:02.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="A General Algorithm for Enumerating Permutations">
     <meta name="twitter:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
@@ -50,7 +50,7 @@
     "headline": "A General Algorithm for Enumerating Permutations",
     "url": "http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/",
     "datePublished": "2016-07-05T03:18:00.000Z",
-    "dateModified": "2016-08-08T06:38:03.000Z",
+    "dateModified": "2016-08-08T06:51:02.000Z",
     "description": "Permutation problems abound in computer science: for instance, many \\(NP\\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common &quot;foe&quot; for job applicants to face in technical interviews! In this post, we develop"
 }
     </script>
@@ -255,9 +255,9 @@
 
 <p>For example, to enumerate the strings with no duplicate letters, we need only invoke the permutation generator we just implemented and filter out the strings with duplicates.</p>
 
-<p>It turns out that this "filtering" approach will work in very general contexts, thus suggesting we add a <code>predicate</code> parameter to our function; the purpose of said parameter would be to filter out those elements of the output which do not satisfy the predicate. To subsume our original problem, the predicate will default to a function which always returns <code>true</code>.</p>
+<p>It turns out that this "filtering" approach will work in very general contexts, thus suggesting we add a <code>predicate</code> parameter to our function; the purpose of said parameter would be to filter out those elements of the output which do not satisfy the predicate. </p>
 
-<pre><code class="language-javascript">var genPermutations = (predicate = () =&gt; true, alphabet, n, currentList = [''], i = 0) =&gt; {  
+<pre><code class="language-javascript">var genPermutations = (predicate, alphabet, n, currentList = [''], i = 0) =&gt; {  
   if (i === n) {
     return currentList.filter(predicate);
   }
@@ -274,7 +274,7 @@
 
 <p>Our solutions to the previously posed problems would thus assume the following forms:</p>
 
-<pre><code class="language-javascript">var allStrings = genPermutations;  
+<pre><code class="language-javascript">var allStrings = genPermutations.bind(null, () =&gt; true);  
 var allStringsWithNoDupLetters = genPermutations.bind(null, hasNoDuplicates);  
 var allStringsWithDupLetters = genPermutations.bind(null, hasDuplicate);  
 var allStringsWithConsecDupLetter = genPermutations.bind(null, hasConsecDuplicate);  
