@@ -24,7 +24,7 @@
     <meta property="og:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
     <meta property="og:url" content="http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/">
     <meta property="article:published_time" content="2016-07-05T03:18:00.000Z">
-    <meta property="article:modified_time" content="2016-08-08T06:51:02.000Z">
+    <meta property="article:modified_time" content="2016-08-08T07:37:24.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="A General Algorithm for Enumerating Permutations">
     <meta name="twitter:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
@@ -50,7 +50,7 @@
     "headline": "A General Algorithm for Enumerating Permutations",
     "url": "http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/",
     "datePublished": "2016-07-05T03:18:00.000Z",
-    "dateModified": "2016-08-08T06:51:02.000Z",
+    "dateModified": "2016-08-08T07:37:24.000Z",
     "description": "Permutation problems abound in computer science: for instance, many \\(NP\\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common &quot;foe&quot; for job applicants to face in technical interviews! In this post, we develop"
 }
     </script>
@@ -253,18 +253,22 @@
 
 <p>As is often the case, doing this one basic variant of our problem has opened the door to tidy resolutions of the "more difficult" versions we proposed earlier.</p>
 
-<p>For example, to enumerate the strings with no duplicate letters, we need only invoke the permutation generator we just implemented and filter out the strings with duplicates.</p>
+<p>For example, to enumerate the strings with no duplicate letters, we need only modify the permutation generator we just implemented to "filter out" strings with duplicates before they are added to the <code>newList</code>.</p>
 
 <p>It turns out that this "filtering" approach will work in very general contexts, thus suggesting we add a <code>predicate</code> parameter to our function; the purpose of said parameter would be to filter out those elements of the output which do not satisfy the predicate. </p>
 
 <pre><code class="language-javascript">var genPermutations = (predicate, alphabet, n, currentList = [''], i = 0) =&gt; {  
   if (i === n) {
-    return currentList.filter(predicate);
+    return currentList;
   }
 
   var newList = currentList.reduce((list, perm) =&gt; {
     return alphabet.reduce((updatedList, letter) =&gt; {
-      return [...updatedList, perm + letter];
+      if (predicate(perm + letter)) {
+        return [...updatedList, perm + letter];
+      } else {
+        return [...updatedList];
+      }
     }, list);
   }, []);
 
@@ -281,12 +285,6 @@ var allStringsWithConsecDupLetter = genPermutations.bind(null, hasConsecDuplicat
 </code></pre>
 
 <p>We leave the implementation of <code>hasNoDuplicates</code>, <code>hasDuplicate</code>, and <code>hasConsecDuplicate</code> as an exercise for the reader!</p>
-
-<h2>A Word on Efficiency</h2>
-
-<p>Our focus here has been on finding a general algorithm that resolved all four problems under consideration in one fell swoop. The solution we derived is by no means the most efficient way of handling some of these problems.</p>
-
-<p>One example of an optimization that can be made arises with <code>allStringsWithNoDupLetters</code>: it works much better to simply not append strings with duplicate letters to the <code>newList</code>, as opposed to waiting until the end of the recursion to filter them all out.</p>
         </section>
 
         <footer class="post-footer">
