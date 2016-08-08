@@ -1,0 +1,350 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>A General Algorithm for Enumerating Permutations</title>
+    <meta name="description" content="">
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=5775b0df25">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic%7COpen+Sans:700,400">
+    <link rel="stylesheet" type="text/css" href="../assets/css/prism.css?v=5775b0df25">
+
+    <link rel="canonical" href="http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/">
+    <meta name="referrer" content="origin-when-cross-origin">
+    
+    <meta property="og:site_name" content="A Mathematician In Not-So-Strange Lands">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="A General Algorithm for Enumerating Permutations">
+    <meta property="og:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
+    <meta property="og:url" content="http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/">
+    <meta property="article:published_time" content="2016-07-05T03:18:00.000Z">
+    <meta property="article:modified_time" content="2016-08-08T06:38:03.000Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="A General Algorithm for Enumerating Permutations">
+    <meta name="twitter:description" content='Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews! In this post, we develop'>
+    <meta name="twitter:url" content="http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Jamie Long">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "A Mathematician In Not-So-Strange Lands",
+        "logo": "http://jtlong3rd.github.io/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Jamie Long",
+        "url": "http://jtlong3rd.github.io/author/jamie/",
+        "sameAs": []
+    },
+    "headline": "A General Algorithm for Enumerating Permutations",
+    "url": "http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/",
+    "datePublished": "2016-07-05T03:18:00.000Z",
+    "dateModified": "2016-08-08T06:38:03.000Z",
+    "description": "Permutation problems abound in computer science: for instance, many \\(NP\\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common &quot;foe&quot; for job applicants to face in technical interviews! In this post, we develop"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.9">
+    <link rel="alternate" type="application/rss+xml" title="A Mathematician In Not-So-Strange Lands" href="http://jtlong3rd.github.io/rss/">
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="index.html#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://jtlong3rd.github.io/">Home</a></li>
+            <li class="nav-github" role="presentation"><a href="https://github.com/jtlong3rd">Github</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://jtlong3rd.github.io/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        
+            <a class="menu-button icon-menu" href="index.html#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">A General Algorithm for Enumerating Permutations</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-07-05">05 July 2016</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation and inspection of the relevant solution space. It is no surprise that these algorithms are a common "foe" for job applicants to face in technical interviews!</p>
+
+<p>In this post, we develop an iterative solution for some of these problems and show how it can be refactored using tail recursion, whose virtues I <a href="http://jtlong3rd.github.io/tail-recursion-and-es6/">recently extolled</a>. We then widen the scope of the algorithm to handle an even larger class of problems.</p>
+
+<h2>A Disclaimer on Terminology</h2>
+
+<p>To facilitate our discussion, I will be using the word <em>permutation</em> to conflate what mathematicians usually explicitly delineate as <em>permutations</em> (no repetitions allowed) and <em>tuples</em> (repetitions allowed). This abuse of language should not cause any confusion.</p>
+
+<h2>Common Types of Permutation Problems</h2>
+
+<p>Given an array of letters (henceforth referred to as an <em>alphabet</em>) and a nonnegative integer \(n\), it is natural to ask the following:</p>
+
+<ul>  
+<li>What strings of length \(n\) can be formed from this alphabet?</li>  
+<li>Which of these strings have no repeated letters? (For example, <code>abc</code> would be valid, but <code>aba</code> would not be.)</li>  
+<li>Contrariwise, which of these strings have a repeated letter? (<code>abc</code> would now be invalid, but <code>aba</code> would be all right.)</li>  
+<li>Finally, which of these strings have a CONSECUTIVE repeated letter? (Here, <code>aab</code> and <code>aba</code> would be acceptable and unacceptable, respectively.)</li>  
+</ul>
+
+<p>For the time being, we'll restrict our attention to the first class of permutations.</p>
+
+<h2>An Iterative Solution</h2>
+
+<p>Consider the alphabet <code>['a', 'b', 'c']</code>. If we wanted to form all possible strings of length \(n=2\) from this alphabet, we could "start from the bottom":</p>
+
+<ul>  
+<li>There is of course only one string of length \(0\), namely <code>''</code>.</li>  
+<li>All the strings of length \(1\) can be obtained by appending one letter from our alphabet to <code>''</code> (our unique string of length \(0\)). We would thusly have <code>''+'a'==='a'</code>, <code>''+'b'==='b'</code>, and <code>''+'c'==='c'</code>.  
+</li><li>Similarly, all of the strings of length \(2\) can be obtained by appending one letter from our alphabet to each of the strings of length \(1\). In doing so, we would arrive at the following \(9\) strings:  
+<ul>  
+<li><code>'a'+'a'==='aa'</code></li>  
+<li><code>'a'+'b'==='ab'</code></li>  
+<li><code>'a'+'c'==='ac'</code></li>  
+<li><code>'b'+'a'==='ba'</code></li>  
+<li><code>'b'+'b'==='bb'</code></li>  
+<li><code>'b'+'c'==='bc'</code></li>  
+<li><code>'c'+'a'==='ca'</code></li>  
+<li><code>'c'+'b'==='cb'</code></li>  
+<li><code>'c'+'c'==='cc'</code></li>  
+</ul>  
+
+<p></p></li></ul>
+
+<p>This approach readily generalizes to the following pseudocode:</p>
+
+<pre><code>Given an alphabet array and nonnegative integer n...  
+  1. Set the current permutation list equal to ['']
+  2. For i === 1 to i === n... 
+    - Create an empty list for storing "new" permutations
+    - Run through the current permutation list, and for each element of this list, add alphabet.length many permutations to the "new" list (each of which is the result of appending a single letter from the alphabet)
+    - Set the current list equal to the "new" list
+  3. Finally, return the current list
+</code></pre>
+
+<p>The JavaScript largely writes itself:</p>
+
+<pre><code class="language-javascript">var genPermutations = (alphabet, n) =&gt; {  
+  var currentList = [''];
+
+  for (var i = 1; i &lt;= n; i++) {
+    var newList = [];
+
+    for (var j = 0; j &lt; currentList.length; j++) {
+      for (var k = 0; k &lt; alphabet.length; k++) {
+        newList.push(currentList[j] + alphabet[k]);
+      }
+    }
+
+    currentList = newList;
+  }
+
+  return currentList;
+};
+</code></pre>
+
+<h2>Needs More Cowb.... Err, Recursion</h2>
+
+<p>Virtually every iterative algorithm can be refactored into one using tail recursion, and this situation is no different. We start by eliminating the outermost loop, which entails migrating some variables to the parameter list and assigning to them the necessary default values.</p>
+
+<pre><code class="language-javascript">var genPermutations = (alphabet, n, currentList = [''], i = 0) =&gt; {  
+  if (i === n) {
+    return currentList;
+  }
+
+  var newList = [];
+
+  for (var j = 0; j &lt; currentList.length; j++) {
+    for (var k = 0; k &lt; alphabet.length; k++) {
+      newList.push(currentList[j] + alphabet[k]);
+    }
+  }
+
+  return genPermutations(alphabet, n, newList, i + 1);
+};
+</code></pre>
+
+<p>We can touch up our function even more by recognizing that the new outermost loop can be refactored using <code>reduce</code>.</p>
+
+<pre><code class="language-javascript">var genPermutations = (alphabet, n, currentList = [''], i = 0) =&gt; {  
+  if (i === n) {
+    return currentList;
+  }
+
+  var newList = currentList.reduce((list, perm) =&gt; {
+    for (var k = 0; k &lt; alphabet.length; k++) {
+      list.push(perm + alphabet[k]);
+    }
+
+    return list;
+  }, []);
+
+  return genPermutations(alphabet, n, newList, i + 1);
+};
+</code></pre>
+
+<p>We can even eliminate the final loop with another application of <code>reduce</code>!</p>
+
+<pre><code class="language-javascript">var genPermutations = (alphabet, n, currentList = [''], i = 0) =&gt; {  
+  if (i === n) {
+    return currentList;
+  }
+
+  var newList = currentList.reduce((list, perm) =&gt; {
+    return alphabet.reduce((updatedList, letter) =&gt; {
+      return updatedList.concat([perm + letter]);
+    }, list);
+  }, []);
+
+  return genPermutations(alphabet, n, newList, i + 1);
+};
+</code></pre>
+
+<p>Last, we improve the readability of our code by using the ES6 spread operator instead of <code>concat</code>:</p>
+
+<pre><code class="language-javascript">var genPermutations = (alphabet, n, currentList = [''], i = 0) =&gt; {  
+  if (i === n) {
+    return currentList;
+  }
+
+  var newList = currentList.reduce((list, perm) =&gt; {
+    return alphabet.reduce((updatedList, letter) =&gt; {
+      return [...updatedList, perm + letter];
+    }, list);
+  }, []);
+
+  return genPermutations(alphabet, n, newList, i + 1);
+};
+</code></pre>
+
+<p>Whew!</p>
+
+<h2>That Escalated Quickly</h2>
+
+<p>As is often the case, doing this one basic variant of our problem has opened the door to tidy resolutions of the "more difficult" versions we proposed earlier.</p>
+
+<p>For example, to enumerate the strings with no duplicate letters, we need only invoke the permutation generator we just implemented and filter out the strings with duplicates.</p>
+
+<p>It turns out that this "filtering" approach will work in very general contexts, thus suggesting we add a <code>predicate</code> parameter to our function; the purpose of said parameter would be to filter out those elements of the output which do not satisfy the predicate. To subsume our original problem, the predicate will default to a function which always returns <code>true</code>.</p>
+
+<pre><code class="language-javascript">var genPermutations = (predicate = () =&gt; true, alphabet, n, currentList = [''], i = 0) =&gt; {  
+  if (i === n) {
+    return currentList.filter(predicate);
+  }
+
+  var newList = currentList.reduce((list, perm) =&gt; {
+    return alphabet.reduce((updatedList, letter) =&gt; {
+      return [...updatedList, perm + letter];
+    }, list);
+  }, []);
+
+  return genPermutations(predicate, alphabet, n, newList, i + 1);
+};
+</code></pre>
+
+<p>Our solutions to the previously posed problems would thus assume the following forms:</p>
+
+<pre><code class="language-javascript">var allStrings = genPermutations;  
+var allStringsWithNoDupLetters = genPermutations.bind(null, hasNoDuplicates);  
+var allStringsWithDupLetters = genPermutations.bind(null, hasDuplicate);  
+var allStringsWithConsecDupLetter = genPermutations.bind(null, hasConsecDuplicate);  
+</code></pre>
+
+<p>We leave the implementation of <code>hasNoDuplicates</code>, <code>hasDuplicate</code>, and <code>hasConsecDuplicate</code> as an exercise for the reader!</p>
+
+<h2>A Word on Efficiency</h2>
+
+<p>Our focus here has been on finding a general algorithm that resolved all four problems under consideration in one fell swoop. The solution we derived is by no means the most efficient way of handling some of these problems.</p>
+
+<p>One example of an optimization that can be made arises with <code>allStringsWithNoDupLetters</code>: it works much better to simply not append strings with duplicate letters to the <code>newList</code>, as opposed to waiting until the end of the recursion to filter them all out.</p>
+        </section>
+
+        <footer class="post-footer">
+
+
+
+            <section class="author">
+                <h4><a href="../author/jamie/">Jamie Long</a></h4>
+
+                    <p>Read <a href="../author/jamie/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=A%20General%20Algorithm%20for%20Enumerating%20Permutations&amp;url=http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://jtlong3rd.github.io/a-general-algorithm-for-enumerating-permutations/" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story prev no-cover" href="../es6-in-action-reimplementing-bind/">
+        <section class="post">
+            <h2>ES6 in Action: Reimplementing 'Bind'</h2>
+            <p>In this post, I will "motivate" ES6 by showing how it can be used to write a surprisingly clean…</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://jtlong3rd.github.io">A Mathematician In Not-So-Strange Lands</a> © 2016</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    
+    <script type="text/javascript" src="../assets/js/jquery.fitvids.js?v=5775b0df25"></script>
+    <script type="text/javascript" src="../assets/js/index.js?v=5775b0df25"></script>
+
+    <script type="text/javascript" src="../assets/js/prism.js?v=5775b0df25"></script>
+</body>
