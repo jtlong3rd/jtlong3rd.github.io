@@ -24,7 +24,7 @@
     <meta property="og:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
     <meta property="og:url" content="http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/">
     <meta property="article:published_time" content="2016-07-13T02:30:00.000Z">
-    <meta property="article:modified_time" content="2016-08-10T15:01:14.000Z">
+    <meta property="article:modified_time" content="2016-08-10T15:26:16.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Doing Hard Work with Lazy Evaluation">
     <meta name="twitter:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
@@ -50,7 +50,7 @@
     "headline": "Doing Hard Work with Lazy Evaluation",
     "url": "http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/",
     "datePublished": "2016-07-13T02:30:00.000Z",
-    "dateModified": "2016-08-10T15:01:14.000Z",
+    "dateModified": "2016-08-10T15:26:16.000Z",
     "description": "In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,"
 }
     </script>
@@ -184,7 +184,7 @@ console.log(zeroToInfinityIter.next().value); // 4
 
 <h2>Grabbing Items from an Infinitely Long List</h2>
 
-<p>To wrap up, we'll use our <code>primeIter</code> to determine the \(10000\)th prime number. Our approach will be to implement the <code>take</code> function from Haskell. This function will receive an <code>iterator</code> and a positive integer <code>n</code>, and then returns an array consisting of the first <code>n</code> items yielded by this iterator.</p>
+<p>To wrap up, we'll use our <code>primeIter</code> to determine the \(10000\)th prime number. Our approach will be to implement the <code>take</code> function from Haskell. This function will receive an <code>iterator</code> and a positive integer <code>n</code>, and then return an array consisting of the first <code>n</code> items yielded by this iterator.</p>
 
 <p>(For simplicity's sake, we will once more assume that <code>iterator</code> runs through infinitely many items.)</p>
 
@@ -220,6 +220,10 @@ console.log(zeroToInfinityIter.next().value); // 4
 <p>By executing this code, we learn in a fraction of a second that the \(10000\)th prime is \(104729\).</p>
 
 <p>All in a day's work for lazy evaluation!</p>
+
+<h2>Word of Warning</h2>
+
+<p>Part of the reason why eager evaluation reigns supreme in most programming languages is that it can be much harder to reason about the correctness of a lazily evaluated function which produces side effects. Haskell successfully circumvents this issue by forcing all functions to be pure, but in other languages such as JavaScript, we need to be extra careful to ensure that any side effects produced by our generators will not interfere with the correctness of our algorithm.</p>
         </section>
 
         <footer class="post-footer">
