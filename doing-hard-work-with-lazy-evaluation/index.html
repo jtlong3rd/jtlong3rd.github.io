@@ -1,0 +1,283 @@
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Doing Hard Work with Lazy Evaluation</title>
+    <meta name="description" content="">
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/screen.css?v=5775b0df25">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic%7COpen+Sans:700,400">
+    <link rel="stylesheet" type="text/css" href="../assets/css/prism.css?v=5775b0df25">
+
+    <link rel="canonical" href="http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/">
+    <meta name="referrer" content="origin-when-cross-origin">
+    
+    <meta property="og:site_name" content="A Mathematician In Not-So-Strange Lands">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Doing Hard Work with Lazy Evaluation">
+    <meta property="og:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
+    <meta property="og:url" content="http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/">
+    <meta property="article:published_time" content="2016-07-13T02:30:00.000Z">
+    <meta property="article:modified_time" content="2016-08-10T05:15:58.000Z">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Doing Hard Work with Lazy Evaluation">
+    <meta name="twitter:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
+    <meta name="twitter:url" content="http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Jamie Long">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "A Mathematician In Not-So-Strange Lands",
+        "logo": "http://jtlong3rd.github.io/ghost/img/ghosticon.jpg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Jamie Long",
+        "url": "http://jtlong3rd.github.io/author/jamie/",
+        "sameAs": []
+    },
+    "headline": "Doing Hard Work with Lazy Evaluation",
+    "url": "http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/",
+    "datePublished": "2016-07-13T02:30:00.000Z",
+    "dateModified": "2016-08-10T05:15:58.000Z",
+    "description": "In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 0.9">
+    <link rel="alternate" type="application/rss+xml" title="A Mathematician In Not-So-Strange Lands" href="http://jtlong3rd.github.io/rss/">
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body class="post-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="index.html#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+            <li class="nav-home" role="presentation"><a href="http://jtlong3rd.github.io/">Home</a></li>
+            <li class="nav-github" role="presentation"><a href="https://github.com/jtlong3rd">Github</a></li>
+            <li class="nav-linkedin" role="presentation"><a href="http://linkedin.com/in/jtlong3rd">LinkedIn</a></li>
+    </ul>
+        <a class="subscribe-button icon-feed" href="http://jtlong3rd.github.io/rss/">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        
+
+
+<header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        
+            <a class="menu-button icon-menu" href="index.html#"><span class="word">Menu</span></a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Doing Hard Work with Lazy Evaluation</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2016-07-13">13 July 2016</time> 
+            </section>
+        </header>
+
+        <section class="post-content">
+            <p>In most mainstream programming languages, functions are evaluated <em>eagerly</em>: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ <em>lazy evaluation</em> instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way, a lazily evaluated function will only do as much work as its invoker requests!</p>
+
+<p>One of more exciting (albeit <a href="https://github.com/airbnb/javascript#generators--nope">controversial</a>) additions to ES6 has been its introduction of <em>generators</em> which, unlike traditional JavaScript functions, can be evaluated lazily.</p>
+
+<p>In this post, we'll... </p>
+
+<ul>  
+<li>Implement a generator which iterates through every nonnegative integer...</li>  
+<li>Write a variation of <code>filter</code> that works on infinitely long iterable objects...</li>  
+<li>Compose the above to produce an enumeration of the prime numbers...</li>  
+<li>... and use this enumeration to find the \(10,000\)th prime!</li>  
+</ul>
+
+<h2>You're Kidding, Right?</h2>
+
+<p>Naturally, the first three of these goals would be impossible to do with regular JavaScript functions. Indeed, the following function obviously has an inescapable infinite loop:</p>
+
+<pre><code class="language-javascript">var zeroToInfinityEager = function() {  
+  for (var n = 0; n &lt; Infinity; n++) {
+    console.log(n);
+  }
+};
+</code></pre>
+
+<p>Generators, on the hand, can enter an infinite loop and live to tell the tale:</p>
+
+<pre><code class="language-javascript">var zeroToInfinityLazy = function* () {  
+  for (var n = 0; n &lt; Infinity; n++) {
+    yield n;
+  }
+};
+</code></pre>
+
+<p>Let us clarify the above code for a reader who is seeing generators for the first time:</p>
+
+<ul>  
+<li>We indicate that a function is to be evaluated lazily by using the <code>function*</code> syntax</li>.  
+<li>A generator yields control to its invoker via the <code>yield</code> keyword</li>.  
+</ul>
+
+<p>Generators are so lazy that, upon their initial invocation, they don't even execute a single line of their body. Instead, they begrudgingly return an ES6 iterator, which the invoker can use to force the generator to work until its next <code>yield</code> or <code>return</code> statement.</p>
+
+<p>Here is how we might use our <code>zeroToInfinityLazy</code> generator to log the first 5 nonnegative integers to the console:</p>
+
+<pre><code class="language-javascript">var zeroToInfinityIter = zeroToInfinityLazy();
+
+console.log(zeroToInfinityIter.next().value); // 0  
+console.log(zeroToInfinityIter.next().value); // 1  
+console.log(zeroToInfinityIter.next().value); // 2  
+console.log(zeroToInfinityIter.next().value); // 3  
+console.log(zeroToInfinityIter.next().value); // 4  
+</code></pre>
+
+<p>Note that when we invoke the <code>next</code> method on our iterator, an object with the keys <code>done</code> and <code>value</code> is returned. <code>value</code> is self-explanatory, while <code>done</code> indicates whether the generator has <code>return</code>ed, and here is truly done (as opposed to merely <code>yield</code>ed).</p>
+
+<h2>Filtering Generators</h2>
+
+<p>Let us turn our attention to how to create a <code>filter</code> generator for infinitely long sequences, such as that traced by our <code>zeroToInfinityIter</code>.</p>
+
+<p>More precisely, we would like a <code>filter</code> generator which receives an <code>iterator</code> and <code>predicate</code> as parameters, and returns an iterator which runs through only those elements of <code>iterator</code> which also satisfy the <code>predicate</code>.</p>
+
+<p>To avoid unnecessary complications, we will assume that the <code>iterator</code> traverses through infinitely many values, and that infinitely many of these infinitely many values (tongue twister!) satisfy the <code>predicate</code>.</p>
+
+<p>(For us, the quintessential use case will involve <code>zeroToInfinityIter</code> and <code>isPrime</code>.)</p>
+
+<p>Luckily, the intuition of how <code>filter</code> works is clear: we just repeatedly invoke the <code>iterator</code>'s <code>next</code> method, and whenever we encounter a value which satisfies the predicate, we <code>yield</code> it.</p>
+
+<pre><code class="language-javascript">var filter = function* (iterator, predicate) {  
+  while (true) {
+    var nextGenerated = iterator.next();
+
+    if (predicate(nextGenerated.value)) {
+      yield nextGenerated.value;
+    }
+  }
+};
+</code></pre>
+
+<p>We can now compose this new generator with our <code>zeroToInfinityIter</code> and favorite implementation of <code>isPrime</code> to obtain an iterator which runs through all the prime numbers:</p>
+
+<pre><code class="language-javascript">var primeIter = filter(zeroToInfinityIter, isPrime);  
+</code></pre>
+
+<h2>Grabbing Items from an Infinitely Long List</h2>
+
+<p>To wrap up, we'll use our <code>primeIter</code> to determine the \(10000\)th prime number. Our approach will be to implement the <code>take</code> function from Haskell. This function will receive an <code>iterator</code> and a positive integer <code>n</code>, and then returns an array consisting of the first <code>n</code> yielded by this iterator.</p>
+
+<p>(For simplicity's sake, we will once more assume that <code>iterator</code> runs through infinitely many items.)</p>
+
+<p>As was the case when we implemented <code>filter</code>, the way forward is intuitively clear: after initializing an empty array, we invoke the <code>next</code> method of <code>iterator</code> a total of <code>n</code> times, making sure to push the latest value to our array every time.</p>
+
+<pre><code class="language-javascript">var take = function(iterator, n) {  
+  var taken = [];
+
+  for (var i = 0; i &lt; n; i++) {
+    taken.push(iterator.next().value);
+  }
+
+  return taken;
+};
+</code></pre>
+
+<p>As a matter of taste, this implementation can be refactored to use tail recursion instead:</p>
+
+<pre><code class="language-javascript">var take = function(iterator, n, taken = []) {  
+  if (n === 0) {
+    return taken;
+  }
+
+  return take(iterator, n - 1, [...taken, iterator.next().value]);
+};
+</code></pre>
+
+<p>Now all we need to do to obtain the \(10,000\)th prime is <code>take</code> the first <code>10000</code> elements of <code>primeIter</code> and pick off the end of this array by using Underscore's <code>last</code> function.</p>
+
+<pre><code class="language-javascript">var prime10000 = _.last(take(primeIter, 10000));  
+</code></pre>
+
+<p>By executing all the previous code, we learn in a fraction of a second that the \(10,000\)th prime is \(104729\).</p>
+
+<p>All in a day's work, no?</p>
+        </section>
+
+        <footer class="post-footer">
+
+
+
+            <section class="author">
+                <h4><a href="../author/jamie/">Jamie Long</a></h4>
+
+                    <p>Read <a href="../author/jamie/">more posts</a> by this author.</p>
+                <div class="author-meta">
+                    
+                    
+                </div>
+            </section>
+
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text=Doing%20Hard%20Work%20with%20Lazy%20Evaluation&amp;url=http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    <a class="read-next-story prev no-cover" href="../a-general-algorithm-for-enumerating-permutations/">
+        <section class="post">
+            <h2>A General Algorithm for Enumerating Permutations</h2>
+            <p>Permutation problems abound in computer science: for instance, many \(NP\)-complete problems can be solved via a brute-force generation…</p>
+        </section>
+    </a>
+</aside>
+
+
+
+        <footer class="site-footer clearfix">
+            <section class="copyright"><a href="http://jtlong3rd.github.io">A Mathematician In Not-So-Strange Lands</a> © 2016</section>
+            <section class="poweredby">Proudly published with <a href="https://ghost.org">Ghost</a></section>
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    
+    <script type="text/javascript" src="../assets/js/jquery.fitvids.js?v=5775b0df25"></script>
+    <script type="text/javascript" src="../assets/js/index.js?v=5775b0df25"></script>
+
+    <script type="text/javascript" src="../assets/js/prism.js?v=5775b0df25"></script>
+</body>
