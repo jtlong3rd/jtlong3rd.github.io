@@ -24,7 +24,7 @@
     <meta property="og:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
     <meta property="og:url" content="http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/">
     <meta property="article:published_time" content="2016-07-13T02:30:00.000Z">
-    <meta property="article:modified_time" content="2016-08-10T15:26:16.000Z">
+    <meta property="article:modified_time" content="2016-08-11T04:32:07.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Doing Hard Work with Lazy Evaluation">
     <meta name="twitter:description" content="In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,">
@@ -50,7 +50,7 @@
     "headline": "Doing Hard Work with Lazy Evaluation",
     "url": "http://jtlong3rd.github.io/doing-hard-work-with-lazy-evaluation/",
     "datePublished": "2016-07-13T02:30:00.000Z",
-    "dateModified": "2016-08-10T15:26:16.000Z",
+    "dateModified": "2016-08-11T04:32:07.000Z",
     "description": "In most mainstream programming languages, functions are evaluated eagerly: as soon as they are invoked, they run until termination. Other languages, most notably Haskell, employ lazy evaluation instead: a function can yield control in the middle of its evaluation until its invoker requests that the computation resume. Put another way,"
 }
     </script>
@@ -164,7 +164,7 @@ console.log(zeroToInfinityIter.next().value); // 4
 
 <p>(For us, the quintessential use case will involve <code>zeroToInfinityIter</code> and <code>isPrime</code>.)</p>
 
-<p>Luckily, the intuition of how <code>filter</code> works is clear: we just repeatedly invoke the <code>iterator</code>'s <code>next</code> method, and whenever we encounter a value which satisfies the predicate, we <code>yield</code> it.</p>
+<p>Luckily, the intuition of how <code>filter</code> works is clear: we just repeatedly invoke the <code>iterator</code>'s <code>next</code> method, and whenever we encounter a value which satisfies the <code>predicate</code>, we <code>yield</code> it.</p>
 
 <pre><code class="language-javascript">var filter = function* (iterator, predicate) {  
   while (true) {
