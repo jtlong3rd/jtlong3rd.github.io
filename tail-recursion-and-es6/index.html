@@ -24,7 +24,7 @@
     <meta property="og:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
     <meta property="og:url" content="http://jtlong3rd.github.io/tail-recursion-and-es6/">
     <meta property="article:published_time" content="2016-06-27T22:28:00.000Z">
-    <meta property="article:modified_time" content="2016-08-11T15:14:32.000Z">
+    <meta property="article:modified_time" content="2016-08-11T15:20:49.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Tail Recursion and ES6">
     <meta name="twitter:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
@@ -50,7 +50,7 @@
     "headline": "Tail Recursion and ES6",
     "url": "http://jtlong3rd.github.io/tail-recursion-and-es6/",
     "datePublished": "2016-06-27T22:28:00.000Z",
-    "dateModified": "2016-08-11T15:14:32.000Z",
+    "dateModified": "2016-08-11T15:20:49.000Z",
     "description": "Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to"
 }
     </script>
@@ -141,7 +141,8 @@
 
 <p>By performing a common sort of "sleight" which I'll describe in another post, the above recursive solution can be refactored into one using tail recursion:</p>
 
-<pre><code class="language-javascript">var sumUpTo = function(n, currSum=0) {  "&gt;  if (n &lt;= 0) {
+<pre><code class="language-javascript">var sumUpTo = function(n, currSum=0) {  
+  if (n &lt;= 0) {
     return currSum;
   }
 
