@@ -24,7 +24,7 @@
     <meta property="og:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
     <meta property="og:url" content="http://jtlong3rd.github.io/tail-recursion-and-es6/">
     <meta property="article:published_time" content="2016-06-27T22:28:00.000Z">
-    <meta property="article:modified_time" content="2016-08-07T18:41:25.000Z">
+    <meta property="article:modified_time" content="2016-08-11T15:14:32.000Z">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Tail Recursion and ES6">
     <meta name="twitter:description" content="Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to">
@@ -50,7 +50,7 @@
     "headline": "Tail Recursion and ES6",
     "url": "http://jtlong3rd.github.io/tail-recursion-and-es6/",
     "datePublished": "2016-06-27T22:28:00.000Z",
-    "dateModified": "2016-08-07T18:41:25.000Z",
+    "dateModified": "2016-08-11T15:14:32.000Z",
     "description": "Spoiler alert: As of ES6, JavaScript is a true functional programming language! What is Tail Recursion? A recursive function is said to be tail-recursive if its only recursive calls are tail calls; that is, subroutine calls whose values are immediately returned. To illustrate this definition and its special relevance to"
 }
     </script>
@@ -157,9 +157,9 @@
 
 <p>(I'll wait here.)</p>
 
-<p>As you can see, something very strange is happening. Both the iterative and the tail-recursive solution quickly return the correct answer of <code>500000500000</code>, but our original recursive solution generates a "maximum call stack size exceeded" <code>ReferenceError</code>.</p>
+<p>As you can see, something very strange is happening. Both the iterative and the tail-recursive solution quickly return the correct answer of <code>500000500000</code>, but our original recursive solution throws a "maximum call stack size exceeded" <code>ReferenceError</code>.</p>
 
-<p>To make matters even more interesting, if you were to run the natural "ES5-ified" versions of our three solutions, you'd find that, while the iterative solution still returns <code>500000500000</code>, both recursive solutions now yield <code>ReferenceError</code>s.</p>
+<p>To make matters even more interesting, if you were to run the natural "ES5-ified" versions of our three solutions, you'd find that while the iterative solution still returns <code>500000500000</code>, both recursive solutions now throw <code>ReferenceError</code>s.</p>
 
 <h2>What's Going On?!</h2>
 
